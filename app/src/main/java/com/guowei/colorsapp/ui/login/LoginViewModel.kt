@@ -28,7 +28,6 @@ class LoginViewModel @Inject constructor(
     fun login(username: String, password: String) {
         disposable.add(
             loginUseCase.login(username, password)
-                .ignoreElement()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

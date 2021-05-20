@@ -4,7 +4,7 @@ import com.guowei.colorsapp.di.activity.ActivityComponent
 import dagger.Component
 
 @AppScope
-@Component(modules = [AppModule::class])
+@Component(modules = [AppModule::class, CacheModule::class])
 interface AppComponent {
     fun newActivityComponentBuilder(): ActivityComponent.Builder
 }
