@@ -4,9 +4,6 @@ data class Consumable<out T>(private val content: T) {
 
     private var hasBeenConsumed = false
 
-    /**
-     * Consume the content if it is not consumed before.
-     */
     fun consume(onConsume: T.() -> Unit) {
         if (hasBeenConsumed) {
             null

@@ -28,6 +28,8 @@ class LoginActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        injector.inject(this)
+
         loginButton = findViewById(R.id.loginButton)
         usernameEditText = findViewById(R.id.userNameEditText)
         passwordEditText = findViewById(R.id.passwordEditText)
@@ -35,8 +37,6 @@ class LoginActivity : BaseActivity() {
         loginButton.setOnClickListener {
             viewModel.login(usernameEditText.text.toString(), passwordEditText.text.toString())
         }
-
-        injector.inject(this)
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
 

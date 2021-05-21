@@ -1,7 +1,11 @@
 package com.guowei.colorsapp.di.app
 
 import android.app.Application
-import com.guowei.colorsapp.networking.ColorsApi
+import android.content.Context
+import com.guowei.colorsapp.cache.SessionCache
+import com.guowei.colorsapp.networking.AuthInterceptor
+import com.guowei.colorsapp.networking.api.StorageApi
+import com.guowei.colorsapp.networking.api.UserApi
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -16,15 +20,8 @@ class AppModule(private val application: Application) {
 
     @Provides
     @AppScope
-    fun httpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-            .build()
-    }
-
-    @Provides
-    @AppScope
     fun retrofit(httpClient: OkHttpClient): Retrofit {
+
         return Retrofit.Builder()
             .baseUrl("https://54t9f06ot1.execute-api.eu-central-1.amazonaws.com/api/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -35,9 +32,29 @@ class AppModule(private val application: Application) {
 
     @Provides
     @AppScope
-    fun application() = application
+    fun httpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addInterceptor(authInterceptor)
+            .build()
+    }
 
     @Provides
     @AppScope
-    fun colorsApi(retrofit: Retrofit): ColorsApi = retrofit.create(ColorsApi::class.java)
+    fun authInterceptor(sessionCache: SessionCache): AuthInterceptor {
+        return AuthInterceptor(sessionCache)
+    }
+
+    @Provides
+    @AppScope
+    fun colorsApi(retrofit: Retrofit): UserApi = retrofit.create(UserApi::class.java)
+
+    @Provides
+    @AppScope
+    fun storageApi(retrofit: Retrofit): StorageApi = retrofit.create(StorageApi::class.java)
+
+    @Provides
+    @AppScope
+    fun context(): Context = application
+
 }

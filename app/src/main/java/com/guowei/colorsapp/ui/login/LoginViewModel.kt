@@ -40,6 +40,11 @@ class LoginViewModel @Inject constructor(
         )
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        disposable.clear()
+    }
+
     companion object {
         private const val LOGIN_LIVEDATA = "login"
     }

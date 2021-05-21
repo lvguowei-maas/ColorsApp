@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.guowei.colorsapp.R
+import com.guowei.colorsapp.ui.colors.ColorsActivity
 import com.guowei.colorsapp.ui.common.activity.BaseActivity
 import com.guowei.colorsapp.ui.common.viewmodel.ViewModelFactory
 import com.guowei.colorsapp.ui.login.LoginActivity
@@ -27,11 +28,11 @@ class SplashActivity : BaseActivity() {
         viewModel.isLoggedInLiveData.observe(this, Observer {
             it.consume {
                 if (this) {
-                    // TODO
+                    ColorsActivity.start(this@SplashActivity)
                 } else {
                     LoginActivity.start(this@SplashActivity)
-                    finish()
                 }
+                finish()
             }
         })
     }

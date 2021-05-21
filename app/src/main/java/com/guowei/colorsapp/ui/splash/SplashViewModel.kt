@@ -28,7 +28,7 @@ class SplashViewModel @Inject constructor(
 
         disposable.add(
             loginUseCase.isLoggedIn()
-                .delay(2, TimeUnit.SECONDS)
+                .delay(1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

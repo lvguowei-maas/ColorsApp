@@ -1,6 +1,7 @@
 package com.guowei.colorsapp.di.presentation
 
 import androidx.lifecycle.ViewModel
+import com.guowei.colorsapp.ui.colors.ColorsViewModel
 import com.guowei.colorsapp.ui.login.LoginViewModel
 import com.guowei.colorsapp.ui.splash.SplashViewModel
 import dagger.Binds
@@ -19,5 +20,10 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(LoginViewModel::class)
     abstract fun loginViewModel(viewModel: LoginViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ColorsViewModel::class)
+    abstract fun colorsViewModel(viewModel: ColorsViewModel): ViewModel
 
 }
