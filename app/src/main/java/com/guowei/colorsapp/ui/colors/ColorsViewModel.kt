@@ -19,30 +19,30 @@ class ColorsViewModel @Inject constructor(
     private lateinit var _uiModelLiveData: MutableLiveData<ColorsUiModel>
     val uiModelLiveData: LiveData<ColorsUiModel> get() = _uiModelLiveData
 
-    private lateinit var _isLoadingLiveData: MutableLiveData<Boolean>
-    val isLoadingLiveData: LiveData<Boolean> get() = _isLoadingLiveData
-
     override fun init(savedStateHandle: SavedStateHandle) {
-        _uiModelLiveData = savedStateHandle.getLiveData(CURRENT_COLOR_LIVEDATA)
-        _isLoadingLiveData = savedStateHandle.getLiveData(IS_LOADING_LIVEDATA)
+        _uiModelLiveData = savedStateHandle.getLiveData(
+            CURRENT_COLOR_LIVEDATA,
+            ColorsUiModel(null, null, null, true)
+        )
 
         Single.zip(
             colorsUseCase.getOrCreate(),
             colorsUseCase.getColorSet(),
             BiFunction { current: String, colorSet: List<String> ->
                 ColorsUiModel(
-                    current,
-                    current,
-                    colorSet
+                    currentColor = current,
+                    chosenColor = current,
+                    colorSet = colorSet,
+                    isLoading = false
                 )
             })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
-                _isLoadingLiveData.value = true
+                _uiModelLiveData.value = _uiModelLiveData.value?.copy(isLoading = true)
             }
             .doFinally {
-                _isLoadingLiveData.value = false
+                _uiModelLiveData.value = _uiModelLiveData.value?.copy(isLoading = false)
             }
             .subscribe(
                 {
@@ -59,8 +59,12 @@ class ColorsViewModel @Inject constructor(
             colorsUseCase.update(it)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe { _isLoadingLiveData.value = true }
-                .doFinally { _isLoadingLiveData.value = false }
+                .doOnSubscribe {
+                    _uiModelLiveData.value = _uiModelLiveData.value?.copy(isLoading = true)
+                }
+                .doFinally {
+                    _uiModelLiveData.value = _uiModelLiveData.value?.copy(isLoading = false)
+                }
                 .subscribe({ updatedColor ->
                     _uiModelLiveData.value = _uiModelLiveData.value!!.copy(
                         currentColor = updatedColor
@@ -86,6 +90,5 @@ class ColorsViewModel @Inject constructor(
 
     companion object {
         private const val CURRENT_COLOR_LIVEDATA = "current_color"
-        private const val IS_LOADING_LIVEDATA = "is_loading"
     }
 }

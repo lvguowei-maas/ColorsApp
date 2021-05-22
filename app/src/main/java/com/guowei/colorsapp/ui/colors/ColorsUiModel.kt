@@ -3,46 +3,55 @@ package com.guowei.colorsapp.ui.colors
 import android.graphics.Color
 
 data class ColorsUiModel(
-    // current color set in the server
-    val currentColor: String,
+    // current color on the server
+    val currentColor: String?,
     // color displayed currently chosen by user
-    val chosenColor: String,
-    val colorSet: List<String>
+    val chosenColor: String?,
+    val colorSet: List<String>?,
+    val isLoading: Boolean
 ) {
 
     private val currentIndex by lazy {
-        colorSet.indexOf(chosenColor)
+        colorSet?.indexOf(chosenColor) ?: -1
     }
 
     val prevButtonEnabled by lazy {
-        currentIndex > 0
+        !isLoading && currentIndex > 0
     }
 
     val nextButtonEnabled by lazy {
-        currentIndex < colorSet.size - 1
+        !isLoading && colorSet?.let {
+            currentIndex < it.size - 1
+        } ?: false
     }
 
     val bgColor by lazy {
-        Color.parseColor(chosenColor)
+        chosenColor?.let {
+            Color.parseColor(it)
+        } ?: Color.WHITE
     }
 
     val setButtonVisible by lazy {
-        !currentColor.equals(chosenColor, ignoreCase = true)
+        !isLoading && !currentColor.equals(chosenColor, ignoreCase = true)
     }
 
     val next by lazy {
-        if (currentIndex == colorSet.size - 1) {
-            null
-        } else {
-            copy(chosenColor = colorSet[currentIndex + 1])
+        colorSet?.let {
+            if (currentIndex == it.size - 1) {
+                null
+            } else {
+                copy(chosenColor = it[currentIndex + 1])
+            }
         }
     }
 
     val previous by lazy {
-        if (currentIndex == 0) {
-            null
-        } else {
-            copy(chosenColor = colorSet[currentIndex - 1])
+        colorSet?.let {
+            if (currentIndex == 0) {
+                null
+            } else {
+                copy(chosenColor = it[currentIndex - 1])
+            }
         }
     }
 }

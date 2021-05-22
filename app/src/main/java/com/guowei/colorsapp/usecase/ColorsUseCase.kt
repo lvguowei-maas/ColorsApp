@@ -23,7 +23,7 @@ class ColorsUseCase @Inject constructor(
         }
             .flatMap { storageId ->
                 if (storageId.isBlank()) {
-                    storageApi.create(StorageRequestBody(White))
+                    storageApi.create(StorageRequestBody(YellowGreen))
                         .doOnSuccess { sessionCache.saveStorageId(it.id) }
                         .map { it.data }
                 } else {
@@ -46,14 +46,34 @@ class ColorsUseCase @Inject constructor(
                 it.take(3).delay(1, TimeUnit.SECONDS)
             }
 
-    fun getColorSet(): Single<List<String>> = Single.just(listOf(White, AliceBlue, Aqua, DarkBlue))
+    fun getColorSet(): Single<List<String>> =
+        Single.just(
+            listOf(
+                YellowGreen,
+                Tomato,
+                RoyalBlue,
+                Plum,
+                Orange,
+                Moccasin,
+                MistyRose,
+                LightSteelBlue,
+                LightSalmon,
+                LightCyan
+            )
+        )
 
 
     companion object {
-        private const val White = "#ffffff"
-        private const val AliceBlue = "#F0F8FF"
-        private const val Aqua = "#00FFFF"
-        private const val DarkBlue = "#00008B"
+        private const val YellowGreen = "#9ACD32"
+        private const val Tomato = "#FF6347"
+        private const val RoyalBlue = "#4169E1"
+        private const val Plum = "#DDA0DD"
+        private const val Orange = "#FFA500"
+        private const val Moccasin = "#FFE4B5"
+        private const val MistyRose = "#FFE4E1"
+        private const val LightSteelBlue = "#B0C4DE"
+        private const val LightSalmon = "#FFA07A"
+        private const val LightCyan = "#E0FFFF"
 
     }
 }
