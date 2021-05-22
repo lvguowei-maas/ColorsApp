@@ -2,7 +2,9 @@ package com.guowei.colorsapp.usecase
 
 import com.guowei.colorsapp.cache.SessionCache
 import com.guowei.colorsapp.networking.api.StorageApi
+import com.guowei.colorsapp.networking.schema.StorageRequestBody
 import io.reactivex.Single
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ColorsUseCase @Inject constructor(
@@ -20,17 +22,21 @@ class ColorsUseCase @Inject constructor(
         }
             .flatMap { storageId ->
                 if (storageId.isBlank()) {
-                    storageApi.create(WHITE)
+                    storageApi.create(StorageRequestBody(WHITE))
                         .doOnSuccess { sessionCache.saveStorageId(it.id) }
                         .map { it.data }
                 } else {
                     storageApi.get(storageId).map { it.data }
                 }
             }
+            .retryWhen {
+                // retry max 3 times with 1 sec delay
+                it.take(3).delay(1, TimeUnit.SECONDS)
+            }
 
 
     companion object {
-        private const val WHITE = "#000000"
+        private const val WHITE = "#FFFFFF"
     }
 
 }

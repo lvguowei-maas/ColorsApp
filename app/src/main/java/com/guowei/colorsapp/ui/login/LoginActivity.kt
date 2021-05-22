@@ -5,10 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.guowei.colorsapp.R
+import com.guowei.colorsapp.ui.colors.ColorsActivity
 import com.guowei.colorsapp.ui.common.activity.BaseActivity
 import com.guowei.colorsapp.ui.common.viewmodel.ViewModelFactory
 import javax.inject.Inject
@@ -42,8 +42,8 @@ class LoginActivity : BaseActivity() {
 
         viewModel.loginLiveData.observe(this, Observer {
             it.consume {
-                Toast.makeText(this@LoginActivity, if (this) "Yes" else "No", Toast.LENGTH_LONG)
-                    .show()
+                ColorsActivity.start(this@LoginActivity)
+                finish()
             }
         })
     }
