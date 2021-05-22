@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
-import com.guowei.colorsapp.ui.common.utils.Consumable
-import com.guowei.colorsapp.ui.common.utils.toConsumable
 import com.guowei.colorsapp.ui.common.viewmodel.SavedStateViewModel
 import com.guowei.colorsapp.usecase.ColorsUseCase
 import io.reactivex.Single
@@ -18,8 +16,8 @@ class ColorsViewModel @Inject constructor(
     private val colorsUseCase: ColorsUseCase
 ) : SavedStateViewModel() {
 
-    private lateinit var _uiModelLiveData: MutableLiveData<Consumable<ColorsUiModel>>
-    val uiModelLiveData: LiveData<Consumable<ColorsUiModel>> get() = _uiModelLiveData
+    private lateinit var _uiModelLiveData: MutableLiveData<ColorsUiModel>
+    val uiModelLiveData: LiveData<ColorsUiModel> get() = _uiModelLiveData
 
     private lateinit var _isLoadingLiveData: MutableLiveData<Boolean>
     val isLoadingLiveData: LiveData<Boolean> get() = _isLoadingLiveData
@@ -48,13 +46,25 @@ class ColorsViewModel @Inject constructor(
             }
             .subscribe(
                 {
-                    _uiModelLiveData.value = it.toConsumable()
+                    _uiModelLiveData.value = it
                 },
                 {
                     Log.e("test", "TODO load current color error", it)
                 }
             ).addToDisposable()
 
+    }
+
+    fun previous() {
+        _uiModelLiveData.value?.previous?.let {
+            _uiModelLiveData.value = it
+        }
+    }
+
+    fun next() {
+        _uiModelLiveData.value?.next?.let {
+            _uiModelLiveData.value = it
+        }
     }
 
     companion object {

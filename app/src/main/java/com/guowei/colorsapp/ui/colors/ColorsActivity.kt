@@ -2,7 +2,6 @@ package com.guowei.colorsapp.ui.colors
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -26,6 +25,8 @@ class ColorsActivity : BaseActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var rootView: View
 
+    private lateinit var uiModel: ColorsUiModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_colors)
@@ -37,23 +38,30 @@ class ColorsActivity : BaseActivity() {
         progressBar = findViewById(R.id.progressBar)
         rootView = window.decorView.rootView
 
+        prevButton.setOnClickListener {
+            viewModel.previous()
+        }
+
+        nextButton.setOnClickListener {
+            viewModel.next()
+        }
+
         viewModel = ViewModelProvider(this, viewModelFactory).get(ColorsViewModel::class.java)
 
         viewModel.uiModelLiveData.observe(this, Observer {
-            it.consume {
-                populate(this)
-            }
+            uiModel = it
+            populate()
         })
 
         viewModel.isLoadingLiveData.observe(this, Observer {
-            prevButton.isEnabled = !it
-            nextButton.isEnabled = !it
             progressBar.visibility = if (it) View.VISIBLE else View.GONE
         })
     }
 
-    private fun populate(uiModel: ColorsUiModel) {
-        rootView.setBackgroundColor(Color.parseColor(uiModel.current))
+    private fun populate() {
+        rootView.setBackgroundColor(uiModel.bgColor)
+        prevButton.isEnabled = uiModel.prevButtonEnabled
+        nextButton.isEnabled = uiModel.nextButtonEnabled
     }
 
     companion object {
