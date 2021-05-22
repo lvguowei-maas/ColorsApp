@@ -55,7 +55,21 @@ class ColorsViewModel @Inject constructor(
     }
 
     fun updateColor() {
+        _uiModelLiveData.value?.chosenColor?.let {
+            colorsUseCase.update(it)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { _isLoadingLiveData.value = true }
+                .doFinally { _isLoadingLiveData.value = false }
+                .subscribe({ updatedColor ->
+                    _uiModelLiveData.value = _uiModelLiveData.value!!.copy(
+                        currentColor = updatedColor
+                    )
+                }, {
+                    // TODO handle error
+                })
 
+        }
     }
 
     fun previous() {

@@ -35,6 +35,17 @@ class ColorsUseCase @Inject constructor(
                 it.take(3).delay(1, TimeUnit.SECONDS)
             }
 
+    fun update(color: String): Single<String> =
+        Single.fromCallable {
+            sessionCache.getStorageId()
+        }
+            .flatMap { id ->
+                storageApi.update(id, StorageRequestBody(color)).map { it.data }
+            }
+            .retryWhen {
+                it.take(3).delay(1, TimeUnit.SECONDS)
+            }
+
     fun getColorSet(): Single<List<String>> = Single.just(listOf(White, AliceBlue, Aqua, DarkBlue))
 
 
