@@ -32,10 +32,10 @@ class ColorsViewModel @Inject constructor(
             BiFunction { current: String, colorSet: List<String> ->
                 ColorsUiModel(
                     current,
+                    current,
                     colorSet
                 )
             })
-
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
@@ -52,6 +52,9 @@ class ColorsViewModel @Inject constructor(
                     Log.e("test", "TODO load current color error", it)
                 }
             ).addToDisposable()
+    }
+
+    fun updateColor() {
 
     }
 

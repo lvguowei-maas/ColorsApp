@@ -7,7 +7,7 @@ import io.reactivex.disposables.Disposable
 
 abstract class SavedStateViewModel : ViewModel() {
 
-    protected val compositeDisposable: CompositeDisposable = CompositeDisposable()
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     abstract fun init(savedStateHandle: SavedStateHandle)
 
