@@ -22,7 +22,12 @@ class ColorsViewModel @Inject constructor(
     override fun init(savedStateHandle: SavedStateHandle) {
         _uiModelLiveData = savedStateHandle.getLiveData(
             CURRENT_COLOR_LIVEDATA,
-            ColorsUiModel(null, null, null, true)
+            ColorsUiModel(
+                currentColor = null,
+                chosenColor = null,
+                colorSet = null,
+                isLoading = true
+            )
         )
 
         Single.zip(
@@ -72,7 +77,6 @@ class ColorsViewModel @Inject constructor(
                 }, {
                     // TODO handle error
                 })
-
         }
     }
 

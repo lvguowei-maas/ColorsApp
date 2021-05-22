@@ -58,7 +58,7 @@ class ColorsUseCase @Inject constructor(
                 MistyRose,
                 LightSteelBlue,
                 LightSalmon,
-                LightCyan
+                Avocado
             )
         )
 
@@ -73,7 +73,7 @@ class ColorsUseCase @Inject constructor(
         private const val MistyRose = "#FFE4E1"
         private const val LightSteelBlue = "#B0C4DE"
         private const val LightSalmon = "#FFA07A"
-        private const val LightCyan = "#E0FFFF"
+        private const val Avocado = "#568203"
 
     }
 }
