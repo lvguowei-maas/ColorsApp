@@ -11,8 +11,9 @@ class ColorsUseCase @Inject constructor(
     private val storageApi: StorageApi,
     private val sessionCache: SessionCache
 ) {
+
     /**
-     * Get the current color from server if exists, otherwise create with INIT_COLOR.
+     * Get the current color from server if exists, otherwise create with color white.
      * If storage id exists, get color by storage id from server.
      * Otherwise, create storage with color WHITE and then save the storage id in session cache.
      */
@@ -22,7 +23,7 @@ class ColorsUseCase @Inject constructor(
         }
             .flatMap { storageId ->
                 if (storageId.isBlank()) {
-                    storageApi.create(StorageRequestBody(INIT_COLOR))
+                    storageApi.create(StorageRequestBody(White))
                         .doOnSuccess { sessionCache.saveStorageId(it.id) }
                         .map { it.data }
                 } else {
@@ -34,8 +35,14 @@ class ColorsUseCase @Inject constructor(
                 it.take(3).delay(1, TimeUnit.SECONDS)
             }
 
+    fun getColorSet(): Single<List<String>> = Single.just(listOf(White, AliceBlue, Aqua, DarkBlue))
+
 
     companion object {
-        private const val INIT_COLOR = "#FFFFFF"
+        private const val White = "#ffffff"
+        private const val AliceBlue = "#F0F8FF"
+        private const val Aqua = "#00FFFF"
+        private const val DarkBlue = "#00008B"
+
     }
 }

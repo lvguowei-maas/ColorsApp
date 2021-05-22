@@ -21,7 +21,6 @@ class ColorsActivity : BaseActivity() {
 
     private lateinit var viewModel: ColorsViewModel
 
-
     private lateinit var prevButton: Button
     private lateinit var nextButton: Button
     private lateinit var progressBar: ProgressBar
@@ -40,8 +39,10 @@ class ColorsActivity : BaseActivity() {
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(ColorsViewModel::class.java)
 
-        viewModel.currentColorLiveData.observe(this, Observer {
-            rootView.setBackgroundColor(Color.parseColor(it))
+        viewModel.uiModelLiveData.observe(this, Observer {
+            it.consume {
+                populate(this)
+            }
         })
 
         viewModel.isLoadingLiveData.observe(this, Observer {
@@ -49,6 +50,10 @@ class ColorsActivity : BaseActivity() {
             nextButton.isEnabled = !it
             progressBar.visibility = if (it) View.VISIBLE else View.GONE
         })
+    }
+
+    private fun populate(uiModel: ColorsUiModel) {
+        rootView.setBackgroundColor(Color.parseColor(uiModel.current))
     }
 
     companion object {

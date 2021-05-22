@@ -29,7 +29,7 @@ class SplashViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { isLoggedIn -> _isLoggedInLiveData.value = isLoggedIn.toConsumable() },
-                { e -> Log.e("test", "handle error in checking is user logged in") }
+                { e -> Log.e("test", "TODO handle error in checking is user logged in", e) }
             ).addToDisposable()
     }
 
