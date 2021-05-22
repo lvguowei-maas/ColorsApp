@@ -7,15 +7,12 @@ import androidx.lifecycle.SavedStateHandle
 import com.guowei.colorsapp.ui.common.viewmodel.SavedStateViewModel
 import com.guowei.colorsapp.usecase.ColorsUseCase
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class ColorsViewModel @Inject constructor(
     private val colorsUseCase: ColorsUseCase
 ) : SavedStateViewModel() {
-
-    private val disposable: CompositeDisposable = CompositeDisposable()
 
     private lateinit var _currentColorLiveData: MutableLiveData<String>
     val currentColorLiveData: LiveData<String> get() = _currentColorLiveData
@@ -27,25 +24,24 @@ class ColorsViewModel @Inject constructor(
         _currentColorLiveData = savedStateHandle.getLiveData(CURRENT_COLOR_LIVEDATA)
         _isLoadingLiveData = savedStateHandle.getLiveData(IS_LOADING_LIVEDATA)
 
-        disposable.add(
-            colorsUseCase.getCurrent()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe {
-                    _isLoadingLiveData.value = true
+        colorsUseCase.getOrCreate()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                _isLoadingLiveData.value = true
+            }
+            .doFinally {
+                _isLoadingLiveData.value = false
+            }
+            .subscribe(
+                {
+                    _currentColorLiveData.value = it
+                },
+                {
+                    Log.e("test", "load current color error", it)
                 }
-                .doFinally {
-                    _isLoadingLiveData.value = false
-                }
-                .subscribe(
-                    {
-                        _currentColorLiveData.value = it
-                    },
-                    {
-                        Log.e("test", "load current color error", it)
-                    }
-                )
-        )
+            ).addToDisposable()
+
     }
 
     companion object {

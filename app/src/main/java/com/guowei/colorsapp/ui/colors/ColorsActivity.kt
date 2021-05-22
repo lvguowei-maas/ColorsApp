@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.guowei.colorsapp.R
@@ -23,6 +24,7 @@ class ColorsActivity : BaseActivity() {
 
     private lateinit var prevButton: Button
     private lateinit var nextButton: Button
+    private lateinit var progressBar: ProgressBar
     private lateinit var rootView: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,12 +35,19 @@ class ColorsActivity : BaseActivity() {
 
         prevButton = findViewById(R.id.prevButton)
         nextButton = findViewById(R.id.nextButton)
+        progressBar = findViewById(R.id.progressBar)
         rootView = window.decorView.rootView
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(ColorsViewModel::class.java)
 
         viewModel.currentColorLiveData.observe(this, Observer {
             rootView.setBackgroundColor(Color.parseColor(it))
+        })
+
+        viewModel.isLoadingLiveData.observe(this, Observer {
+            prevButton.isEnabled = !it
+            nextButton.isEnabled = !it
+            progressBar.visibility = if (it) View.VISIBLE else View.GONE
         })
     }
 

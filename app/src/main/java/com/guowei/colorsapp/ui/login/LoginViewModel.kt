@@ -8,15 +8,12 @@ import com.guowei.colorsapp.ui.common.utils.toConsumable
 import com.guowei.colorsapp.ui.common.viewmodel.SavedStateViewModel
 import com.guowei.colorsapp.usecase.LoginUseCase
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase
 ) : SavedStateViewModel() {
-
-    private val disposable: CompositeDisposable = CompositeDisposable()
 
     private lateinit var _loginLiveData: MutableLiveData<Consumable<Boolean>>
     val loginLiveData: LiveData<Consumable<Boolean>> get() = _loginLiveData
@@ -30,25 +27,19 @@ class LoginViewModel @Inject constructor(
     }
 
     fun login(username: String, password: String) {
-        disposable.add(
-            loginUseCase.login(username, password)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe { _loadingLiveData.value = true }
-                .doFinally { _loadingLiveData.value = false }
-                .subscribe(
-                    {
-                        _loginLiveData.value = true.toConsumable()
-                    },
-                    {
-                        _loginLiveData.value = false.toConsumable()
-                    })
-        )
-    }
+        loginUseCase.login(username, password)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { _loadingLiveData.value = true }
+            .doFinally { _loadingLiveData.value = false }
+            .subscribe(
+                {
+                    _loginLiveData.value = true.toConsumable()
+                },
+                {
+                    _loginLiveData.value = false.toConsumable()
+                }).addToDisposable()
 
-    override fun onCleared() {
-        super.onCleared()
-        disposable.clear()
     }
 
     companion object {
