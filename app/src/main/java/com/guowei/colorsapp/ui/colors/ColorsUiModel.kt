@@ -21,12 +21,12 @@ data class ColorsUiModel(
     }
 
     @IgnoredOnParcel
-    val prevButtonEnabled by lazy {
+    val prevButtonVisible by lazy {
         !isLoading && currentIndex > 0
     }
 
     @IgnoredOnParcel
-    val nextButtonEnabled by lazy {
+    val nextButtonVisible by lazy {
         !isLoading && colorSet?.let {
             currentIndex < it.size - 1
         } ?: false
