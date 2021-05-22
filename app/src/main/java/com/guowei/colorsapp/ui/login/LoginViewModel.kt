@@ -21,8 +21,12 @@ class LoginViewModel @Inject constructor(
     private lateinit var _loginLiveData: MutableLiveData<Consumable<Boolean>>
     val loginLiveData: LiveData<Consumable<Boolean>> get() = _loginLiveData
 
+    private lateinit var _loadingLiveData: MutableLiveData<Boolean>
+    val loadingLiveData: LiveData<Boolean> get() = _loadingLiveData
+
     override fun init(savedStateHandle: SavedStateHandle) {
         _loginLiveData = savedStateHandle.getLiveData(LOGIN_LIVEDATA)
+        _loadingLiveData = savedStateHandle.getLiveData(LOADING_LIVEDATA, false)
     }
 
     fun login(username: String, password: String) {
@@ -30,6 +34,8 @@ class LoginViewModel @Inject constructor(
             loginUseCase.login(username, password)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { _loadingLiveData.value = true }
+                .doFinally { _loadingLiveData.value = false }
                 .subscribe(
                     {
                         _loginLiveData.value = true.toConsumable()
@@ -47,5 +53,6 @@ class LoginViewModel @Inject constructor(
 
     companion object {
         private const val LOGIN_LIVEDATA = "login"
+        private const val LOADING_LIVEDATA = "loading"
     }
 }
