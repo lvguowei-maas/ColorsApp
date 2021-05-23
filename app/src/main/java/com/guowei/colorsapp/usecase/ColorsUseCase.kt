@@ -14,8 +14,6 @@ class ColorsUseCase @Inject constructor(
 
     /**
      * Get the current color from server if exists, otherwise create with first color in the list.
-     * If storage id exists, get color by storage id from server.
-     * Otherwise, create storage with color WHITE and then save the storage id in session cache.
      */
     fun getOrCreate(): Single<String> =
         Single.fromCallable {
@@ -29,11 +27,9 @@ class ColorsUseCase @Inject constructor(
                 } else {
                     storageApi.get(storageId).map { it.data }
                 }
+                    .retryWhen(RetryWithDelay(maxRetries = 3, delay = 1, unit = TimeUnit.SECONDS))
             }
-            .retryWhen {
-                // retry max 3 times with 1 sec delay
-                it.take(3).delay(1, TimeUnit.SECONDS)
-            }
+
 
     fun update(color: String): Single<String> =
         Single.fromCallable {
@@ -41,10 +37,9 @@ class ColorsUseCase @Inject constructor(
         }
             .flatMap { id ->
                 storageApi.update(id, StorageRequestBody(color)).map { it.data }
+                    .retryWhen(RetryWithDelay(maxRetries = 3, delay = 1, unit = TimeUnit.SECONDS))
             }
-            .retryWhen {
-                it.take(3).delay(1, TimeUnit.SECONDS)
-            }
+
 
     fun getColorSet(): Single<List<String>> = Single.just(Colors.colorSet)
 }

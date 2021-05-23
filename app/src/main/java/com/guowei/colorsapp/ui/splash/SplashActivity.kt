@@ -1,9 +1,13 @@
 package com.guowei.colorsapp.ui.splash
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
+import androidx.databinding.DataBindingUtil.setContentView
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.guowei.colorsapp.R
+import com.guowei.colorsapp.databinding.ActivitySplashBinding
 import com.guowei.colorsapp.ui.colors.ColorsActivity
 import com.guowei.colorsapp.ui.common.activity.BaseActivity
 import com.guowei.colorsapp.ui.common.viewmodel.ViewModelFactory
@@ -15,15 +19,16 @@ class SplashActivity : BaseActivity() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-    private lateinit var viewModel: SplashViewModel
+    private val viewModel: SplashViewModel by viewModels { viewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
+
+        with(setContentView<ActivitySplashBinding>(this, R.layout.activity_splash)) {
+            lifecycleOwner = this@SplashActivity
+        }
 
         injector.inject(this)
-
-        viewModel = ViewModelProvider(this, viewModelFactory).get(SplashViewModel::class.java)
 
         viewModel.isLoggedInLiveData.observe(this, Observer {
             it.consume {
@@ -35,5 +40,12 @@ class SplashActivity : BaseActivity() {
                 finish()
             }
         })
+    }
+
+    companion object {
+        fun start(context: Context) {
+            val intent = Intent(context, SplashActivity::class.java)
+            context.startActivity(intent)
+        }
     }
 }

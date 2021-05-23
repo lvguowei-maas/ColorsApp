@@ -40,6 +40,13 @@ class EncryptedSharedPreferenceSessionCache @Inject constructor(
 
     override fun getStorageId() = sharedPreferences.getString(KEY_STORAGE_ID, null)
 
+    override fun clear() {
+        with(sharedPreferences.edit()) {
+            clear()
+            apply()
+        }
+    }
+
     companion object {
         private const val PREFERENCE_FILE = "shared_preference_session"
 

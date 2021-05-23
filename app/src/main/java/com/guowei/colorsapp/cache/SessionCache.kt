@@ -5,4 +5,5 @@ interface SessionCache {
     fun getToken(): String?
     fun saveStorageId(id: String)
     fun getStorageId(): String?
+    fun clear()
 }

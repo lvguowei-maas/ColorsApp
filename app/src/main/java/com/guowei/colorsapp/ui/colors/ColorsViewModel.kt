@@ -4,8 +4,11 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
+import com.guowei.colorsapp.ui.common.utils.Consumable
+import com.guowei.colorsapp.ui.common.utils.toConsumable
 import com.guowei.colorsapp.ui.common.viewmodel.SavedStateViewModel
 import com.guowei.colorsapp.usecase.ColorsUseCase
+import com.guowei.colorsapp.usecase.UserUseCase
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
@@ -13,11 +16,15 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class ColorsViewModel @Inject constructor(
-    private val colorsUseCase: ColorsUseCase
+    private val colorsUseCase: ColorsUseCase,
+    private val userUseCase: UserUseCase
 ) : SavedStateViewModel() {
 
     private lateinit var _uiModelLiveData: MutableLiveData<ColorsUiModel>
     val uiModelLiveData: LiveData<ColorsUiModel> get() = _uiModelLiveData
+
+    private lateinit var _logoutLiveData: MutableLiveData<Consumable<Boolean>>
+    val logoutLiveData: LiveData<Consumable<Boolean>> get() = _logoutLiveData
 
     override fun init(savedStateHandle: SavedStateHandle) {
         _uiModelLiveData = savedStateHandle.getLiveData(
@@ -26,9 +33,11 @@ class ColorsViewModel @Inject constructor(
                 currentColor = null,
                 chosenColor = null,
                 colorSet = null,
-                isLoading = true
+                isLoading = false
             )
         )
+
+        _logoutLiveData = savedStateHandle.getLiveData(LOGOUT_LIVEDATA)
 
         Single.zip(
             colorsUseCase.getOrCreate(),
@@ -77,6 +86,7 @@ class ColorsViewModel @Inject constructor(
                 }, {
                     // TODO handle error
                 })
+                .addToDisposable()
         }
     }
 
@@ -92,7 +102,26 @@ class ColorsViewModel @Inject constructor(
         }
     }
 
+    fun logout() {
+        userUseCase.logout()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                _uiModelLiveData.value = _uiModelLiveData.value?.copy(isLoading = true)
+            }
+            .doFinally {
+                _uiModelLiveData.value = _uiModelLiveData.value?.copy(isLoading = false)
+            }
+            .subscribe({
+                _logoutLiveData.value = true.toConsumable()
+            }, {
+                _logoutLiveData.value = false.toConsumable()
+
+            }).addToDisposable()
+    }
+
     companion object {
         private const val CURRENT_COLOR_LIVEDATA = "current_color"
+        private const val LOGOUT_LIVEDATA = "logout"
     }
 }

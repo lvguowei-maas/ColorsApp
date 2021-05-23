@@ -2,6 +2,7 @@ package com.guowei.colorsapp.networking.api
 
 import com.guowei.colorsapp.networking.schema.StorageRequestBody
 import com.guowei.colorsapp.networking.schema.StorageResponse
+import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.http.*
 
@@ -15,5 +16,8 @@ interface StorageApi {
 
     @PUT("v1/storage/{id}")
     fun update(@Path("id") id: String, @Body data: StorageRequestBody): Single<StorageResponse>
+
+    @DELETE("v1/storage/{id}")
+    fun delete(@Path("id") id: String): Completable
 
 }

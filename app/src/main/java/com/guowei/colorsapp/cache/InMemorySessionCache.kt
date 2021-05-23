@@ -19,4 +19,9 @@ class InMemorySessionCache @Inject constructor() : SessionCache {
     }
 
     override fun getStorageId() = storageId
+
+    override fun clear() {
+        token = null
+        storageId = null
+    }
 }
