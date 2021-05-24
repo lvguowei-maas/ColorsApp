@@ -27,8 +27,8 @@ class ColorsUseCase @Inject constructor(
                 } else {
                     storageApi.get(storageId).map { it.data }
                 }
-                    .retryWhen(RetryWithDelay(maxRetries = 3, delay = 1, unit = TimeUnit.SECONDS))
             }
+            .retryWhen(RetryWithDelay(maxRetries = 3, delay = 1, unit = TimeUnit.SECONDS))
 
 
     fun update(color: String): Single<String> =
@@ -37,8 +37,8 @@ class ColorsUseCase @Inject constructor(
         }
             .flatMap { id ->
                 storageApi.update(id, StorageRequestBody(color)).map { it.data }
-                    .retryWhen(RetryWithDelay(maxRetries = 3, delay = 1, unit = TimeUnit.SECONDS))
             }
+            .retryWhen(RetryWithDelay(maxRetries = 3, delay = 1, unit = TimeUnit.SECONDS))
 
 
     fun getColorSet(): Single<List<String>> = Single.just(Colors.colorSet)

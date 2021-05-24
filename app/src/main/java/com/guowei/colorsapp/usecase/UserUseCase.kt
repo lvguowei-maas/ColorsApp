@@ -31,9 +31,8 @@ class UserUseCase @Inject constructor(
         }
             .flatMapCompletable {
                 storageApi.delete(it)
-                    .retryWhen(RetryWithDelay(maxRetries = 3, delay = 1, unit = TimeUnit.SECONDS))
-
             }
+            .retryWhen(RetryWithDelay(maxRetries = 3, delay = 1, unit = TimeUnit.SECONDS))
             .doOnComplete {
                 sessionCache.clear()
             }
