@@ -40,6 +40,12 @@ class ColorsActivity : BaseActivity() {
                 }
             }
         })
+
+        viewModel.errorLiveData.observe(this, Observer {
+            it.consume {
+                Toast.makeText(this@ColorsActivity, this, Toast.LENGTH_LONG).show()
+            }
+        })
     }
 
     companion object {

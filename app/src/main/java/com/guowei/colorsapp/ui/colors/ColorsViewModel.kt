@@ -1,6 +1,5 @@
 package com.guowei.colorsapp.ui.colors
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -26,6 +25,9 @@ class ColorsViewModel @Inject constructor(
     private lateinit var _logoutLiveData: MutableLiveData<Consumable<Boolean>>
     val logoutLiveData: LiveData<Consumable<Boolean>> get() = _logoutLiveData
 
+    private lateinit var _errorLiveData: MutableLiveData<Consumable<String>>
+    val errorLiveData: LiveData<Consumable<String>> get() = _errorLiveData
+
     override fun init(savedStateHandle: SavedStateHandle) {
         _uiModelLiveData = savedStateHandle.getLiveData(
             CURRENT_COLOR_LIVEDATA,
@@ -36,8 +38,8 @@ class ColorsViewModel @Inject constructor(
                 isLoading = false
             )
         )
-
         _logoutLiveData = savedStateHandle.getLiveData(LOGOUT_LIVEDATA)
+        _errorLiveData = savedStateHandle.getLiveData(ERROR_LIVEDATA)
 
         Single.zip(
             colorsUseCase.getOrCreate(),
@@ -63,7 +65,7 @@ class ColorsViewModel @Inject constructor(
                     _uiModelLiveData.value = it
                 },
                 {
-                    Log.e("test", "TODO load current color error", it)
+                    _errorLiveData.value = "Failed loading current color!".toConsumable()
                 }
             ).addToDisposable()
     }
@@ -84,7 +86,7 @@ class ColorsViewModel @Inject constructor(
                         currentColor = updatedColor
                     )
                 }, {
-                    // TODO handle error
+                    _errorLiveData.value = "Failed update color!".toConsumable()
                 })
                 .addToDisposable()
         }
@@ -123,5 +125,6 @@ class ColorsViewModel @Inject constructor(
     companion object {
         private const val CURRENT_COLOR_LIVEDATA = "current_color"
         private const val LOGOUT_LIVEDATA = "logout"
+        private const val ERROR_LIVEDATA = "error"
     }
 }

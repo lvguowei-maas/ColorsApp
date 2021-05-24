@@ -30,7 +30,6 @@ class ColorsUseCase @Inject constructor(
             }
             .retryWhen(RetryWithDelay(maxRetries = 3, delay = 1, unit = TimeUnit.SECONDS))
 
-
     fun update(color: String): Single<String> =
         Single.fromCallable {
             sessionCache.getStorageId()
@@ -39,7 +38,6 @@ class ColorsUseCase @Inject constructor(
                 storageApi.update(id, StorageRequestBody(color)).map { it.data }
             }
             .retryWhen(RetryWithDelay(maxRetries = 3, delay = 1, unit = TimeUnit.SECONDS))
-
 
     fun getColorSet(): Single<List<String>> = Single.just(Colors.colorSet)
 }

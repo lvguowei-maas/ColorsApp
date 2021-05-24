@@ -21,6 +21,11 @@ class UserUseCaseTest {
 
     private lateinit var useCase: UserUseCase
 
+    private val username = "test"
+    private val password = "123"
+    private val token = "abc"
+    private val storageId = "1"
+
     @Before
     fun setup() {
         RxJavaPlugins.reset()
@@ -38,26 +43,26 @@ class UserUseCaseTest {
 
     @Test
     fun isLoggedIn_hasCachedToken_returnTrue() {
-        every { sessionCache.getToken() }.returns("token")
+        every { sessionCache.getToken() }.returns(token)
         useCase.isLoggedIn().test().assertValue(true)
     }
 
     @Test
     fun login() {
-        every { userApi.login(any()) }.returns(Single.just(LoginResponse("token")))
+        every { userApi.login(any()) }.returns(Single.just(LoginResponse(token)))
         every { sessionCache.saveToken(any()) } just Runs
-        useCase.login("username", "password").test().assertComplete()
+        useCase.login(username, password).test().assertComplete()
 
         verify {
-            sessionCache.saveToken("token")
+            sessionCache.saveToken(token)
         }
     }
 
     @Test
     fun logout_success() {
-        every { sessionCache.getStorageId() }.returns("storageId")
+        every { sessionCache.getStorageId() }.returns(storageId)
         every { sessionCache.clear() } just Runs
-        every { storageApi.delete("storageId") }.returns(Completable.complete())
+        every { storageApi.delete(storageId) }.returns(Completable.complete())
 
         useCase.logout().test().assertComplete()
 
@@ -71,9 +76,9 @@ class UserUseCaseTest {
         val testScheduler = TestScheduler()
         RxJavaPlugins.setComputationSchedulerHandler { testScheduler }
 
-        every { sessionCache.getStorageId() }.returns("storageId")
+        every { sessionCache.getStorageId() }.returns(storageId)
         every { sessionCache.clear() } just Runs
-        every { storageApi.delete("storageId") } returnsMany listOf(
+        every { storageApi.delete(storageId) } returnsMany listOf(
             Completable.error(Throwable()),
             Completable.error(Throwable()),
             Completable.complete()
@@ -85,6 +90,10 @@ class UserUseCaseTest {
 
         verify {
             sessionCache.clear()
+        }
+
+        verify(exactly = 3) {
+            storageApi.delete(storageId)
         }
     }
 }

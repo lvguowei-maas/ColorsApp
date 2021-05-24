@@ -16,6 +16,9 @@ class ColorsUseCaseTest {
 
     private lateinit var useCase: ColorsUseCase
 
+    private val storageId = "1"
+    private val color = "#000000"
+
     @Before
     fun setup() {
         RxJavaPlugins.reset()
@@ -27,34 +30,35 @@ class ColorsUseCaseTest {
 
     @Test
     fun getOrCreate_noStorageId_shouldCreate() {
-        every { sessionCache.getStorageId() }.returns(null)
-        every { storageApi.create(any()) }.returns(Single.just(StorageResponse("id", "color")))
-        every { sessionCache.saveStorageId("id") } just Runs
 
-        useCase.getOrCreate().test().assertValue("color")
+        every { sessionCache.getStorageId() }.returns(null)
+        every { storageApi.create(any()) }.returns(Single.just(StorageResponse(storageId, color)))
+        every { sessionCache.saveStorageId(storageId) } just Runs
+
+        useCase.getOrCreate().test().assertValue(color)
 
         verify {
-            sessionCache.saveStorageId("id")
-            storageApi.get("id") wasNot Called
+            sessionCache.saveStorageId(storageId)
+            storageApi.get(storageId) wasNot Called
         }
     }
 
     @Test
     fun getOrCreate_hasStorageId_shouldGet() {
-        every { sessionCache.getStorageId() }.returns("storageId")
-        every { storageApi.get("storageId") }.returns(
+        every { sessionCache.getStorageId() }.returns(storageId)
+        every { storageApi.get(storageId) }.returns(
             Single.just(
                 StorageResponse(
-                    "storageId",
-                    "color"
+                    storageId,
+                    color
                 )
             )
         )
 
-        useCase.getOrCreate().test().assertValue("color")
+        useCase.getOrCreate().test().assertValue(color)
 
         verify {
-            storageApi.get("storageId")
+            storageApi.get(storageId)
             storageApi.create(any()) wasNot Called
         }
     }
